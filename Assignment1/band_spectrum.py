@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,7 +26,7 @@ dE = float(input("Energy step binwidth ΔE  (eV): "))
 
 a=4.9e-10  # lattice constant in meters for Na BCC
 E0 = -5  # on-site energy in eV
-b=-1   # hopping parameter in eV 
+b=-1   # hopping parameter in eV
 
 M1 = create_matrix(E0,b,n)
 eigenvalues, C_matrix, Dia_matrix = diagonalization(M1)
@@ -41,13 +40,13 @@ for i in range(len(eigenvalues)//2):
 plt.ylabel("Eigenvalues (Energy eV)")
 plt.text(1.5,-4,"Red: Unoccupied Levels\nBlue: Occupied Fermi Levels")
 plt.xticks([])
-plt.title("Eigenvalue Spectrum")
+plt.title(f"Eigenvalue Spectrum (N={n})")
 plt.show()
 
 # plot frequency of eigen values
 bin = np.arange(eigenvalues.min(), eigenvalues.max() + dE, dE)
 plt.hist(eigenvalues, bins = bin ,orientation='horizontal', color='blue', rwidth=0.85)
-plt.title('Histogram of Eigen Values')
+plt.title(f"Histogram of Eigen Values (N={n}),(binwidth={dE})")
 plt.ylabel('Eigen Value')
 plt.xlabel('Frequency')
 plt.show()
@@ -71,4 +70,3 @@ def plot_eigenstates(M):
     plt.show()
 
 plot_eigenstates(M1)
-
