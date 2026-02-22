@@ -1,0 +1,76 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ---------- Core Solver ----------
+def solve_bands(V_G, a=1):
+
+    G = 2*np.pi/a
+    k_vec = np.linspace(-3*np.pi/a, 3*np.pi/a, 1500)
+    g_vals = [-2*G, -G, 0, G, 2*G]
+
+    energies = []
+
+    for k in k_vec:
+        H = np.array([[0.5*(k-g)**2 if i==j else V_G
+                       for j,g in enumerate(g_vals)]
+                       for i,g in enumerate(g_vals)])
+        energies.append(np.linalg.eigvalsh(H))
+
+    return k_vec, np.array(energies)
+
+
+# ---------- 1) Band Plot + Zero Slope ----------
+def plot_bands(V_G, a=1):
+
+    k, E = solve_bands(V_G, a)
+    idx0  = np.argmin(abs(k))
+    idxbz = np.argmin(abs(k - np.pi/a))
+
+    plt.figure(figsize=(8,5))
+
+    for i in range(E.shape[1]):
+        plt.plot(k, E[:,i], 'b')
+
+        # Horizontal tangents (zero slope)
+        plt.plot([k[idx0]-0.4, k[idx0]+0.4],
+                 [E[idx0,i]]*2, 'r', lw=2)
+
+        plt.plot([k[idxbz]-0.4, k[idxbz]+0.4],
+                 [E[idxbz,i]]*2, 'k', lw=2)
+
+    plt.axvline(0, ls='--', c='grey')
+    plt.axvline(np.pi/a, ls='--', c='grey')
+    plt.axvline(-np.pi/a, ls='--', c='grey')
+
+    plt.title(f"Nearly Free Electron Bands (V_G = {V_G})")
+    plt.xlabel("k")
+    plt.ylabel("Energy")
+    plt.ylim(0,40)
+    plt.show()
+
+
+# ---------- 2) Band Gap vs V_G ----------
+def plot_gap_vs_V(a=1):
+
+    V_vals = np.linspace(0.01, 2, 25)
+    gaps = []
+
+    for V in V_vals:
+        k, E = solve_bands(V, a)
+        idxbz = np.argmin(abs(k - np.pi/a))
+        gaps.append(E[idxbz,1] - E[idxbz,0])
+
+    plt.figure(figsize=(7,5))
+    plt.plot(V_vals, gaps, 'o', label="Numerical")
+    plt.plot(V_vals, 2*V_vals, '--', label="ΔE = 2V_G")
+    plt.title("Band Gap vs Harmonic Strength \n"
+    "Gap ∝ Fourier Component of Periodic Potential")
+    plt.xlabel("V_G")
+    plt.ylabel("Band Gap")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+plot_bands(V_G=0.5)
+plot_bands(V_G=2)
+plot_gap_vs_V()
